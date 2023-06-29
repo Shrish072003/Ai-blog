@@ -1,0 +1,286 @@
+import { useRef, useState ,useEffect} from "react";
+// import reactLogo from "./assets/react.svg";
+import "./App.css";
+import axios from "axios";
+
+const YOU = "you";
+const AI = "ai";
+function App() {
+  const textareaRef = useRef();
+  const [qna, setQna] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const chatRef = useRef();
+  const [includeTags, setIncludeTags] = useState(false);
+
+  const updateQNA = (from, value) => {
+    setQna((qna) => [...qna, { from, value }]);
+  };
+  
+  const handleSend = () => {
+    let message = textareaRef.current.value;
+    if (includeTags) {
+      message  += " Genrate 10 sub topics and write 300 words every sub topics and include these keywoards " + tags.join(", ");
+    }
+    updateQNA(YOU, message);
+
+    textareaRef.current.value = "";
+
+    setLoading(true);
+    axios
+      .post("http://localhost:3000/chat", {
+        question: message,
+      })
+      .then((response) => {
+        updateQNA(AI, response.data.answer);
+        
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    chatRef.current.scrollTop = chatRef.current.scrollHeight; // Scroll to the bottom of the chat window
+  }, [qna]);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents the newline character from being added
+      handleSend();
+    }
+  };
+  const renderContent = (qna) => {
+    const value = qna.value;
+
+    if (Array.isArray(value)) {
+      return value.map((v) => <p className="message-text">{v}</p>);
+    }
+
+    return <p className="message-text">{value}</p>;
+  };
+  const [tags, setTags] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeywordDown = (event) => {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      const value = inputValue.trim();
+      if (value) {
+        setTags([...tags, value]);
+        setInputValue('');
+      }
+    }
+  };
+
+  const handleDelete = (tagToDelete) => {
+    const newTags = tags.filter((tag) => tag !== tagToDelete);
+    setTags(newTags);
+  };
+
+  return (
+  <div class="container">
+    <div class="container-main">
+      <div class="chats"  ref={chatRef}>
+        {qna.map((qna) => {
+          if (qna.from === YOU) {
+            return (
+              <div class="send chat">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/2202/2202112.png"
+                  alt=""
+                  class="avtar"
+                />
+                <p>{renderContent(qna)}</p>
+              </div>
+            );
+          }
+          return (
+            <div class="recieve chat">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png"
+                alt=""
+                class="avtar"
+              />
+              <p>{renderContent(qna)}</p>
+            </div>
+          );
+        })}
+
+        {loading && (
+          <div class="recieve chat">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png"
+              alt=""
+              class="avtar"
+            />
+            <p>Typing...</p>
+          </div>
+        )}
+      </div>
+    <div className="Input_box">
+      <div class="chat-input">
+        <textarea 
+          type="text"
+          ref={textareaRef}
+          class="form-control col"
+          placeholder="Send a Message..."
+          onKeyDown={handleKeyDown}
+        />
+        <button disabled={loading} class="btn btn-success" onClick={handleSend}>
+          Send
+        </button>
+        </div>
+      </div>
+      
+    </div>
+    <main className='separator_col'></main>
+    <main className="separator_col_top"></main>
+    <main className="Keywoard_block_main">
+    <main className="Keywoard_block">
+    <div className="inline_keyword">
+      <div className="Keyword_text"><div className="key_text">Keyword</div></div>
+      <label class="switch">
+         <input type="checkbox" onChange={(e) => setIncludeTags(e.target.checked)} />
+            <span class="slider round"></span>
+      </label>
+      </div>
+      <div className="Keyword_text_main">
+      <div className="tag-container">
+        {tags.map((tag) => (
+          <div key={tag} className="tag">
+            {tag}
+            <button onClick={() => handleDelete(tag)}>x</button>
+          </div>
+        ))}
+      </div>
+      </div>
+      <main className="Keyword_tag-input">
+      <input
+        className="tag-input"
+        type="text"
+        placeholder="Add tag"
+        value={inputValue}
+        onChange={(event) => setInputValue(event.target.value)}
+        onKeyDown={handleKeywordDown}
+      />
+    </main>
+    </main>
+    </main>
+  </div>
+  );
+}
+export default App;
+
+
+// import { useRef, useState } from "react";
+// import "./App.css";
+// import axios from "axios";
+
+// const YOU = "you";
+// const AI = "ai";
+
+// function App() {
+//   const questionRef = useRef();
+//   const keywordRef = useRef(); // Define a new ref for the keyword input field
+//   const [qna, setQna] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   const updateQNA = (from, value) => {
+//     setQna((qna) => [...qna, { from, value }]);
+//   };
+
+//   const handleSend = () => {
+//     const question = questionRef.current.value + "";
+//     const keywords = keywordRef.current.value.split(",");
+//     const prompt = `my name is shrish Genrate 10 subtopic and write 600 words on every topic ${question} ${keywords.join(
+//       " "
+//     )}`;
+//     updateQNA(YOU, questionRef.current.value);
+
+//     questionRef.current.value = "";
+//     keywordRef.current.value = "";
+
+//     setLoading(true);
+//     axios
+//       .post("http://localhost:3000/chat", {
+//         prompt,
+//       })
+//       .then((response) => {
+//         updateQNA(AI, response.data.answer);
+//       })
+//       .finally(() => {
+//         setLoading(false);
+//       });
+//   };
+
+//   const renderContent = (qna) => {
+//     const value = qna.value;
+
+//     if (Array.isArray(value)) {
+//       return value.map((v) => <p className="message-text">{v}</p>);
+//     }
+
+//     return <p className="message-text">{value}</p>;
+//   };
+//   return (
+//     <div class="container">
+//       <div class="chats">
+//         {qna.map((qna) => {
+//           if (qna.from === YOU) {
+//             return (
+//               <div class="send chat">
+//                 <img
+//                   src="https://cdn-icons-png.flaticon.com/512/2202/2202112.png"
+//                   alt=""
+//                   class="avtar"
+//                 />
+//                 <p>{renderContent(qna)}</p>
+//               </div>
+//             );
+//           }
+//           return (
+//             <div class="recieve chat">
+//               <img
+//                 src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png"
+//                 alt=""
+//                 class="avtar"
+//               />
+//               <p>{renderContent(qna)}</p>
+//             </div>
+//           );
+//         })}
+
+//         {loading && (
+//           <div class="recieve chat">
+//             <img
+//               src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png"
+//               alt=""
+//               class="avtar"
+//             />
+//             <p>Typing...</p>
+//           </div>
+//         )}
+//       </div>
+
+//       <div class="chat-input">
+//         <input
+//           type="text"
+//           ref={questionRef}
+//           class="form-control col"
+//           placeholder="Type Something"
+//         />
+//         <input
+//           type="text"
+//           ref={keywordRef}
+//           class="form-control col"
+//           placeholder="Enter keywords separated by commas"
+//         />
+//         <button disabled={loading} class="btn btn-success" onClick={handleSend}>
+//           Send
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default App;
