@@ -1,10 +1,12 @@
 import React from 'react'
+import { BrowserRouter as Router, Link } from 'react-router-dom';
 import './main.css';
 export const Navbar = () => {
   return (
     <>
+    <Router>
     <div className='Side_main'>
-    <a href="/write"><div className='Side_button'><div className='logo_img_1'><div className='div_p'>Chats</div></div></div></a>
+    <Link to="/write"><div className='Side_button'><div className='logo_img_1'><div className='div_p'>Write</div></div></div></Link>
     <div className='Side_button'><div className='logo_img_2'><div className='div_p'>Search</div></div></div>
     <div className='Side_button'><div className='logo_img_3'><div className='div_p'>Generate images</div></div></div>
     <div className='Side_button'><div className='logo_img_4'><div className='div_p'>Blogs Ideas</div></div></div>
@@ -16,6 +18,7 @@ export const Navbar = () => {
     <div className='separator'></div>
     <a href="/login"><div className='Side_button'><div className='logo_img_7'><div className='div_p'>Login / Sing up</div></div></div></a>
     </div>
+    </Router>
 </>
   )
 }

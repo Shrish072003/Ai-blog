@@ -1,5 +1,5 @@
 const express = require("express");
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 const { Configuration, OpenAIApi } = require("openai");
 const cors = require("cors");
 const configuration = new Configuration({
